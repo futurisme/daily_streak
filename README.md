@@ -49,13 +49,13 @@ After success, `assets/github-streak.svg` will be generated/updated.
 Online mode:
 
 ```bash
-python3 src/dailystreaks.py --username futurisme --output assets/github-streak.svg
+python3 src/daily_streak --username futurisme --output assets/github-streak.svg
 ```
 
 Offline mode with sample events:
 
 ```bash
-python3 src/dailystreaks.py --username demo --events-file examples/sample_events.json --output assets/github-streak.svg
+python3 src/daily_streak --username demo --events-file examples/sample_events.json --output assets/github-streak.svg
 ```
 
 Sample fixture dates are refreshed to **March 24, 2026**.
