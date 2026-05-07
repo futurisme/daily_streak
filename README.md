@@ -2,7 +2,8 @@
 
 Generate an auto-updating GitHub streak SVG card for your profile README.
 
-- Uses full contribution history (GraphQL) + recent push events (REST) for faster same-day updates.
+- Uses full contribution history (GraphQL) + recent push events (REST) for same-day updates.
+- Persists an Actions API cache so routine runs revalidate only recent history and reuse REST ETags.
 - Output file: `assets/github-streak.svg`.
 - Auto-update workflow: `.github/workflows/update-streaks.yml`.
 - Repository path: `futurisme/daily_streak` (use this exact path in raw image URLs).
@@ -49,7 +50,7 @@ After success, `assets/github-streak.svg` will be generated/updated.
 Online mode:
 
 ```bash
-python3 src/daily_streak --username futurisme --output assets/github-streak.svg
+python3 src/daily_streak --username futurisme --cache-file .cache/daily-streak/history.json --output assets/github-streak.svg
 ```
 
 Offline mode with sample events:
@@ -59,3 +60,5 @@ python3 src/daily_streak --username demo --events-file examples/sample_events.js
 ```
 
 Sample fixture dates are refreshed to **March 24, 2026**.
+
+The scheduled workflow runs hourly to avoid unnecessary GitHub API polling while still keeping the card fresh for same-day activity.

@@ -2,7 +2,7 @@ name: Update Daily Streak Card
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
   push:
     branches: [main, work]
@@ -20,12 +20,24 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+
+      - name: Prepare cache key
+        run: echo "CACHE_DATE=$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
+
+      - name: Restore API cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/daily-streak
+          key: daily-streak-${{ vars.STREAK_USERNAME }}-${{ env.CACHE_DATE }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            daily-streak-${{ vars.STREAK_USERNAME }}-${{ env.CACHE_DATE }}-
+            daily-streak-${{ vars.STREAK_USERNAME }}-
 
       - name: Generate streak SVG
         env:
@@ -45,7 +57,14 @@ jobs:
             --timezone-offset "${STREAK_TIMEZONE_OFFSET:-0}" \
             --max-pages "${STREAK_MAX_PAGES:-5}" \
             --lookback-days "${STREAK_LOOKBACK_DAYS:-45}" \
+            --cache-file .cache/daily-streak/history.json \
             --output assets/github-streak.svg
+
+      - name: Save API cache
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/daily-streak
+          key: daily-streak-${{ vars.STREAK_USERNAME }}-${{ env.CACHE_DATE }}-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Commit changes
         run: |
